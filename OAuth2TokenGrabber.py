@@ -390,10 +390,10 @@ Currently supported auth flows:
                 
                 exp = self.findToken(jsonString, "expires_in")
                 
-                # Set expire time
+                # Set expire time. exp is string
                 if exp != None:
                     with self.tokenLock:
-                        self.expireIn[0] = time.time() + exp
+                        self.expireIn[0] = time.time() + int(exp)
             
             except:
                 pass
@@ -566,6 +566,9 @@ Currently supported auth flows:
                     # Get current time
                     now = int(time.time())
                     
+                    if self.debugMode:
+                       self.writeLog("Seconds till jwt bearer token expiry: " + str(now - exp))
+
                     # If time elapsed with 3 seconds remaining
                     if (now - exp) >= -3:
                         
@@ -573,7 +576,8 @@ Currently supported auth flows:
         
         # Fallback to 'expires_in' value
         except:
-            
+            if self.debugMode:
+                self.writeLog("Seconds till non-jwt bearer token expiry: " + str(int(time.time()) - int(self.expiresIn[0])))            
             # Use 'expires_in' value
             if (int(time.time()) - self.expiresIn[0]) >= -3:
                 
